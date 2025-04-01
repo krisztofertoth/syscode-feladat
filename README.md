@@ -1,4 +1,9 @@
-# Diákok Kezelése
+# Syscode feladat - Tóth Krisztofer
 
-Egy egyszerű webalkalmazás diákok adatainak kezelésére, Angular frontend és Node.js backend használatával.
+Syscode feladat - Tóth Krisztofer
+
+inditás:
+    cd ./profile-service; docker-compose -up
+    cd ./address-service; docker-compose -up
+    cd ./frontend; ng serve
 
