@@ -1,0 +1,199 @@
+openapi: 3.0.0
+info:
+  title: Profile Service API
+  description: API a diákok profiljainak kezeléséhez
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+components:
+  schemas:
+    Student:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: A diák egyedi azonosítója
+        name:
+          type: string
+          description: A diák neve
+        email:
+          type: string
+          format: email
+          description: A diák email címe
+      example:
+        id: "123e4567-e89b-12d3-a456-426614174000"
+        name: "John Doe"
+        email: "john.doe@example.com"
+
+    StudentWithAddress:
+      allOf:
+        - $ref: '#/components/schemas/Student'
+        - type: object
+          properties:
+            address:
+              type: object
+              description: A diák címe (csak autentikált kéréseknél érhető el)
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Hibaüzenet
+      example:
+        message: "Az email cím már használatban van"
+
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              msg:
+                type: string
+                description: Validációs hibaüzenet
+              param:
+                type: string
+                description: A hibás paraméter neve
+              location:
+                type: string
+                description: A hiba helye (body, query, params)
+      example:
+        errors:
+          - msg: "Érvénytelen email cím formátum"
+            param: "email"
+            location: "body"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /api/students:
+    get:
+      summary: Összes diák lekérdezése
+      description: Lekéri az összes diákot. Ha a kérés autentikált, a címeket is visszaadja.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentWithAddress'
+        '500':
+          description: Szerver hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Új diák létrehozása
+      description: Létrehoz egy új diákot a megadott adatokkal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '201':
+          description: Diák sikeresen létrehozva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Érvénytelen kérés vagy duplikált email
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Szerver hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/students/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: A diák egyedi azonosítója
+
+    put:
+      summary: Diák módosítása
+      description: Módosítja egy adott diák adatait
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '200':
+          description: Diák sikeresen módosítva
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Érvénytelen kérés vagy duplikált email
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Diák nem található
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Szerver hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Diák törlése
+      description: Törli egy adott diákot
+      responses:
+        '204':
+          description: Diák sikeresen törölve
+        '404':
+          description: Diák nem található
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Szerver hiba
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 

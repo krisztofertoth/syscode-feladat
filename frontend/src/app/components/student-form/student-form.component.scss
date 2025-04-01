@@ -1,0 +1,26 @@
+.form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-dialog-content {
+  min-width: 400px;
+  padding: 24px;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin-bottom: 0;
+}
+
+button[type="submit"] {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+mat-spinner {
+  margin: 0;
+} 

@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  address-service:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    environment:
+      - PORT=3001
+      - AUTH_USER=admin
+      - AUTH_PASSWORD=admin123
+      - NODE_ENV=development
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3001/api/address"]
+      interval: 10s
+      timeout: 5s
+      retries: 3 

@@ -1,0 +1,67 @@
+<div class="student-list-container">
+  <mat-card>
+    <div class="header">
+      <div class="title-section">
+        <h1>Diákok</h1>
+        <button mat-raised-button color="primary" (click)="openStudentForm()">
+          <mat-icon>add</mat-icon>
+          Új diák
+        </button>
+      </div>
+      <div class="auth-buttons">
+        <button mat-raised-button color="accent" (click)="navigateToLogin()" *ngIf="!isAuthenticated">
+          <mat-icon>login</mat-icon>
+          Admin bejelentkezés
+        </button>
+        <button mat-raised-button color="warn" (click)="logout()" *ngIf="isAuthenticated">
+          <mat-icon>logout</mat-icon>
+          Kijelentkezés
+        </button>
+      </div>
+    </div>
+
+    <div class="loading" *ngIf="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Adatok betöltése...</p>
+    </div>
+
+    <table mat-table [dataSource]="students" *ngIf="!loading && students.length > 0">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Név</th>
+        <td mat-cell *matCellDef="let student">{{student.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let student">{{student.email}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="address">
+        <th mat-header-cell *matHeaderCellDef>Cím</th>
+        <td mat-cell *matCellDef="let student">
+          <span *ngIf="student.address">{{student.address.address}}</span>
+          <span class="no-address" *ngIf="!student.address">Nincs megadva cím</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Műveletek</th>
+        <td mat-cell *matCellDef="let student">
+          <button mat-icon-button color="primary" (click)="openStudentForm(student)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteStudent(student.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="no-data" *ngIf="!loading && students.length === 0">
+      <p>Nincsenek diákok az adatbázisban.</p>
+    </div>
+  </mat-card>
+</div> 
